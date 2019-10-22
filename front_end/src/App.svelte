@@ -6,6 +6,7 @@
 
   // DATA
   let bongs = [];
+  let search = "";
 
   const admin = window.location.pathname === "/admin";
   const eventSource = new EventSource("/event-stream");
@@ -16,7 +17,11 @@
   // COMPUTED
   $: correctBongs = bongs.map(it => ({ ...it, count: parseInt(it.count) }));
   $: total = correctBongs.reduce((acc, { count }) => acc + count, 0);
-  $: sortedBongs = correctBongs.slice().sort(admin ? sortByName : sortByPoints);
+  $: sorter = admin ? sortByName : sortByPoints;
+  $: sortedBongs = correctBongs.slice().sort(sorter);
+  $: displayBongs = admin
+    ? sortedBongs.filter(({ name }) => name.includes(search))
+    : sortedBongs;
 
   // METHODS
   const sortByPoints = (a, b) => b.count - a.count;
@@ -83,6 +88,9 @@
     margin: 0;
     margin-top: 0.5rem;
   }
+  input {
+    margin: 0.5em;
+  }
 
   @media (max-width: 600px) {
     h1 {
@@ -106,9 +114,11 @@
     <h1>#FIKA FÖR BARNEN</h1>
     <h2>{total} fikor hittills</h2>
   </div>
-
+  {#if admin}
+    <input bind:value={search} />
+  {/if}
   <ul>
-    {#each sortedBongs as { name, count } (name)}
+    {#each displayBongs as { name, count } (name)}
       <li animate:flip transition:slide={{ delay: 250, duration: 300 }}>
         {#if admin}
           <button on:click={dec(name, count)}>färre</button>
