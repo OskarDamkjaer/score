@@ -111,8 +111,8 @@
 
 <main>
   <div>
-    <h1>#FIKA FÖR BARNEN</h1>
-    <h2>{total} fikor hittills</h2>
+    <h1>#LOPTHETFÖRBARNEN</h1>
+    <h2>{total} BONGADE HITTILLS</h2>
   </div>
   {#if admin}
     <input bind:value={search} />
