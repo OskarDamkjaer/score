@@ -41,8 +41,59 @@
 </script>
 
 <style>
+  main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   li {
     display: flex;
+    text-transform: uppercase;
+    font-size: 2em;
+    padding: 0;
+    margin: 0.3rem;
+  }
+
+  h3 {
+    padding: 0;
+    margin: 0;
+  }
+
+  div {
+    background-color: #ed4722;
+    padding: 0.6em;
+    margin-top: 1em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-size: 3em;
+    margin: 0;
+  }
+
+  :global(body) {
+    background-color: #00b298;
+    color: white;
+  }
+
+  h2 {
+    font-style: italic;
+    font-size: 2.5em;
+    margin: 0;
+    margin-top: 0.5rem;
+  }
+
+  @media (max-width: 600px) {
+    h1 {
+      font-size: 2em;
+    }
+    h2 {
+      font-size: 1.8em;
+    }
+    li {
+      font-size: 1.5em;
+    }
   }
 </style>
 
@@ -50,19 +101,23 @@
   <title>Sandras BongBeräknare 300H</title>
 </svelte:head>
 
-<h1>Sandras BongBeräknare 300H</h1>
-<h1>Totalt: {total}</h1>
+<main>
+  <div>
+    <h1>#FIKA FÖR BARNEN</h1>
+    <h2>{total} fikor hittills</h2>
+  </div>
 
-<ul>
-  {#each sortedBongs as { name, count } (name)}
-    <li animate:flip transition:slide={{ delay: 250, duration: 300 }}>
-      {#if admin}
-        <button on:click={dec(name, count)}>färre</button>
-      {/if}
-      <h3>{count}. {name}</h3>
-      {#if admin}
-        <button on:click={inc(name)}>fler</button>
-      {/if}
-    </li>
-  {/each}
-</ul>
+  <ul>
+    {#each sortedBongs as { name, count } (name)}
+      <li animate:flip transition:slide={{ delay: 250, duration: 300 }}>
+        {#if admin}
+          <button on:click={dec(name, count)}>färre</button>
+        {/if}
+        <h3>{count}. {name}</h3>
+        {#if admin}
+          <button on:click={inc(name)}>fler</button>
+        {/if}
+      </li>
+    {/each}
+  </ul>
+</main>
