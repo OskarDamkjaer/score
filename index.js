@@ -25,13 +25,13 @@ const dec = (name) => db.run(`update bongs set count=count-1 where name="${name}
 
 const secret = "abc"
 
-app.put('/api/inc', async(req, res) => {
+app.put('/api/inc', async (req, res) => {
     await inc(req.body.name)
     giveList()
     res.end()
 })
 
-app.put('/api/dec', async(req, res) => {
+app.put('/api/dec', async (req, res) => {
     await dec(req.body.name)
     giveList()
     res.end()
@@ -60,7 +60,7 @@ app.get('/event-stream', (req, res) => {
     giveList()
 });
 
-const giveList = async() => {
+const giveList = async () => {
     const data = await getBongs()
     stream.emit("push", "list", JSON.stringify(data))
 }
@@ -68,4 +68,4 @@ const giveList = async() => {
 app.use(express.static(path.join(__dirname, "front_end/public")));
 app.get("*", (req, res) => res.sendFile(path.join(`${__dirname}/front_end/public/index.html`)));
 
-app.listen(3000);
+app.listen(process.env.PORT || 3000);
