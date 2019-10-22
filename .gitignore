@@ -1,0 +1,4 @@
+node_modules
+*.swp
+front_end/public
+front_end/node_modules
