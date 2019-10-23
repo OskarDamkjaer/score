@@ -25,8 +25,8 @@
 
   // METHODS
   const sortByPoints = (a, b) => b.count - a.count;
-  const sortByName = (a, b) => b.name < a.name;
-  const dec = (name, count) => () => count > 0 && alter("/api/dec", name);
+  const sortByName = (a, b) => b.name.localeCompare(a.name);
+  const dec = (name, count) => () => alter("/api/dec", name);
   const inc = name => () => alter("/api/inc", name);
 
   const alter = (url, name) => {
@@ -67,7 +67,7 @@
 
   div {
     background-color: #ed4722;
-    padding: 0.6em;
+    padding: 0 1em 0.5em 1em;
     margin-top: 1em;
     text-transform: uppercase;
   }
@@ -90,6 +90,14 @@
   }
   input {
     margin: 0.5em;
+  }
+
+  #left {
+    background-color: green;
+  }
+
+  #right {
+    background-color: red;
   }
 
   @media (max-width: 600px) {
@@ -118,14 +126,14 @@
     <input bind:value={search} />
   {/if}
   <ul>
-    {#each displayBongs as { name, count } (name)}
+    {#each displayBongs as { name, count }, i (name)}
       <li animate:flip transition:slide={{ delay: 250, duration: 300 }}>
         {#if admin}
-          <button on:click={dec(name, count)}>färre</button>
+          <button id="left" on:click={inc(name)}>fler</button>
         {/if}
-        <h3>{count}. {name}</h3>
+        <h3>{i + 1}. {name}, {count} st</h3>
         {#if admin}
-          <button on:click={inc(name)}>fler</button>
+          <button id="right" on:click={dec(name, count)}>färre</button>
         {/if}
       </li>
     {/each}
