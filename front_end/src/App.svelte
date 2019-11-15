@@ -3,11 +3,14 @@
   import { slide } from "svelte/transition";
   import { flip } from "svelte/animate";
   import { onDestroy } from "svelte";
+  import DonationButton from "./DonationButton.svelte";
 
   // DATA
   let bongs = [];
   let search = "";
+  let newDonation = "";
 
+  // Constants
   const admin = window.location.pathname === "/admin";
   const eventSource = new EventSource("/event-stream");
   eventSource.onmessage = m => {
@@ -19,26 +22,34 @@
   $: total = correctBongs.reduce((acc, { count }) => acc + count, 0);
   $: sorter = admin ? sortByName : sortByPoints;
   $: sortedBongs = correctBongs.slice().sort(sorter);
-  $: displayBongs = admin
-    ? sortedBongs.filter(({ name }) => name.includes(search))
-    : sortedBongs;
+  $: filteredBongs = sortedBongs.filter(({ name }) =>
+    name.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+  );
 
   // METHODS
+  const formatDonation = oren => {
+    const paddedString = oren.toString().padStart(3, "0");
+    const splitIndex = paddedString.length - 2;
+    return [
+      paddedString.substring(0, splitIndex),
+      paddedString.substring(splitIndex)
+    ].join(",");
+  };
   const sortByPoints = (a, b) => b.count - a.count;
   const sortByName = (a, b) => b.name.localeCompare(a.name);
-  const dec = (name, count) => () => alter("/api/dec", name);
-  const inc = name => () => alter("/api/inc", name);
+  const dec = name => () => alter("/api/dec", { name });
+  const inc = name => () => alter("/api/inc", { name });
+  const setDonation = name => () =>
+    alter("/api/setDonation", { name, donation: newDonation });
 
-  const alter = (url, name) => {
+  const alter = (url, data) => {
     fetch(url, {
       method: "PUT",
       cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ name })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
     });
-    // Ignore resp, since we get it from eventSource
+    // Ignore resp, since we get what we want from eventSource
   };
 
   // LIFECYCLE
@@ -53,7 +64,7 @@
   }
 
   li {
-    display: flex;
+    list-style: none;
     text-transform: uppercase;
     font-size: 2em;
     padding: 0;
@@ -63,6 +74,12 @@
   h3 {
     padding: 0;
     margin: 0;
+    display: grid;
+    grid-template-columns: auto 2em 4em;
+  }
+  ul {
+    margin: 0;
+    padding: 0;
   }
 
   div {
@@ -92,6 +109,10 @@
     margin: 0.5em;
   }
 
+  .adminStyle {
+    display: flex;
+  }
+
   #left {
     background-color: green;
   }
@@ -110,6 +131,13 @@
     li {
       font-size: 1.5em;
     }
+    h3 {
+      grid-template-columns: auto 4em;
+      grid-template-rows: auto auto;
+    }
+    .donation {
+      grid-column: 2;
+    }
   }
 </style>
 
@@ -126,16 +154,33 @@
     <input bind:value={search} />
   {/if}
   <ul>
-    {#each displayBongs as { name, count }, i (name)}
-      <li animate:flip transition:slide={{ delay: 250, duration: 300 }}>
-        {#if admin}
+    {#if admin}
+      {#each filteredBongs as { name, count, donation }, i (name)}
+        <li class={'adminStyle'}>
           <button id="left" on:click={inc(name)}>fler</button>
-        {/if}
-        <h3>{i + 1}. {name}, {count} st</h3>
-        {#if admin}
-          <button id="right" on:click={dec(name, count)}>färre</button>
-        {/if}
-      </li>
-    {/each}
+          <h3>
+            <span>{i + 1}. {name}</span>
+            <span style="justify-self: end">{count}🍺</span>
+            <span class="donation" style="justify-self: end">
+              {formatDonation(donation)} 💸
+            </span>
+          </h3>
+          <button id="right" on:click={dec(name)}>färre</button>
+          <DonationButton {name} />
+        </li>
+      {/each}
+    {:else}
+      {#each sortedBongs as { name, count, donation }, i (name + 'admin')}
+        <li animate:flip transition:slide={{ delay: 250, duration: 300 }}>
+          <h3>
+            <span>{i + 1}. {name}</span>
+            <span style="justify-self: end">{count}🍺</span>
+            <span class="donation" style="justify-self: end">
+              {formatDonation(donation)} 💸
+            </span>
+          </h3>
+        </li>
+      {/each}
+    {/if}
   </ul>
 </main>

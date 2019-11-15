@@ -20,23 +20,27 @@ db.run = promisify(db.run);
 
 const getBongs = () => db.all("SELECT * FROM bongs;", []);
 // yes this is sqlinjectable
-const inc = (name) => db.run(`update bongs set count=count+1 where name="${name}"`);
-const dec = (name) => db.run(`update bongs set count=count-1 where name="${name}"`);
+const incBong = (name) => db.run(`update bongs set count=count+1 where name="${name}"`);
+const decBong = (name) => db.run(`update bongs set count=count-1 where name="${name}"`);
+const setDonation = (name, donation) => db.run(`update bongs set donation=${donation} where name="${name}"`);
 
-const secret = "abc"
-
-app.put('/api/inc', async (req, res) => {
-    await inc(req.body.name)
+app.put('/api/inc', async(req, res) => {
+    await incBong(req.body.name)
     giveList()
     res.end()
 })
 
-app.put('/api/dec', async (req, res) => {
-    await dec(req.body.name)
+app.put('/api/dec', async(req, res) => {
+    await decBong(req.body.name)
     giveList()
     res.end()
 })
 
+app.put('/api/setDonation', async(req, res) => {
+    await setDonation(req.body.name, req.body.donation)
+    giveList()
+    res.end()
+})
 
 app.get('/event-stream', (req, res) => {
     // SSE Setup
@@ -60,7 +64,7 @@ app.get('/event-stream', (req, res) => {
     giveList()
 });
 
-const giveList = async () => {
+const giveList = async() => {
     const data = await getBongs()
     stream.emit("push", "list", JSON.stringify(data))
 }
