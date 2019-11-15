@@ -157,16 +157,16 @@
     {#if admin}
       {#each filteredBongs as { name, count, donation }, i (name)}
         <li class={'adminStyle'}>
-          <button id="left" on:click={inc(name)}>fler</button>
           <h3>
             <span>{i + 1}. {name}</span>
             <span style="justify-self: end">{count}🍺</span>
             <span class="donation" style="justify-self: end">
               {formatDonation(donation)} 💸
             </span>
+            <button id="left" on:click={inc(name)}>fler</button>
+            <button id="right" on:click={dec(name)}>färre</button>
+            <DonationButton {name} />
           </h3>
-          <button id="right" on:click={dec(name)}>färre</button>
-          <DonationButton {name} />
         </li>
       {/each}
     {:else}
