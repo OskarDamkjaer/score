@@ -25,6 +25,11 @@
   $: filteredBongs = sortedBongs.filter(({ name }) =>
     name.toLocaleLowerCase().includes(search.toLocaleLowerCase())
   );
+  $: moneyPerBong = correctBongs.reduce(
+    (acc, { donation }) => acc + donation,
+    0
+  );
+  $: moneyForKids = (moneyPerBong * total) / 100;
 
   // METHODS
   const formatDonation = oren => {
@@ -121,7 +126,7 @@
     background-color: red;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 550px) {
     h1 {
       font-size: 2em;
     }
@@ -149,6 +154,7 @@
   <div>
     <h1>#LOPTHETFÖRBARNEN</h1>
     <h2>{total} BONGADE HITTILLS</h2>
+    <h2>{moneyForKids} KRONOR TILL BARNEN</h2>
   </div>
   {#if admin}
     <input bind:value={search} />
@@ -173,7 +179,7 @@
       {#each sortedBongs as { name, count, donation }, i (name + 'admin')}
         <li animate:flip transition:slide={{ delay: 250, duration: 300 }}>
           <h3>
-            <span>{i + 1}. {name}</span>
+            <span>{name}</span>
             <span style="justify-self: end">{count}🍺</span>
             <span class="donation" style="justify-self: end">
               {formatDonation(donation)} 💸
