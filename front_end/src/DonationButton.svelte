@@ -1,31 +1,16 @@
 <script>
   //  PROPS
   export let name;
-
-  // DATA
-  let newDonation = 0;
-  let showInputField = false;
+  export let updatePoints;
 
   // METHODS
-  const setDonation = () =>
-    alter("/api/setDonation", { name, donation: newDonation });
-
-  const hide = () => (showInputField = false);
-  const show = () => (showInputField = true);
-  const setAndHide = e => {
-    e && e.preventDefault();
-    setDonation();
-    hide();
+  const setPoints = (points) => {
+    updatePoints(points);
+    alter("/api/addPoints", { name, points });
   };
-
-  const mob = () => {
-    const ny = prompt("skriv in siffra i öra");
-    const siffra = parseInt(ny);
-
-    if (siffra || siffra >= 0) {
-      newDonation = siffra;
-      setAndHide();
-    }
+  const reset = () => {
+    updatePoints(0);
+    alter("/api/reset", { name });
   };
 
   const alter = (url, data) => {
@@ -33,30 +18,24 @@
       method: "PUT",
       cache: "no-cache",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
     // Ignore resp, since we get what we want from eventSource
   };
+
+  // Constants
+  const possiblePoints = [12, 10, 8, 5, 2];
 </script>
+
+<div>
+  {#each possiblePoints as point}
+    <button on:click={() => setPoints(point)}>{point}</button>
+  {/each}
+  <button on:click={reset}> nollställ </button>
+</div>
 
 <style>
   button {
     font-size: 1rem;
   }
-  input {
-    font-size: 1rem;
-  }
 </style>
-
-<div>
-  {#if !showInputField}
-    <button on:click={show}>ändra donation</button>
-    <button on:click={mob}>samma men för mobil</button>
-  {:else}
-    <form on:submit={setAndHide}>
-      <input type="number" bind:value={newDonation} />
-      <button on:click={hide}>avbryt</button>
-      <button type="submit">klar (skriv ören)</button>
-    </form>
-  {/if}
-</div>
