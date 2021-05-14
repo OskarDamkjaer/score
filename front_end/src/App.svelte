@@ -12,6 +12,7 @@
 
   // Constants
   const admin = window.location.pathname === "/admin";
+  const simple = window.location.pathname === "/simple";
   const eventSource = new EventSource("/event-stream");
   eventSource.onmessage = (m) => {
     const data = JSON.parse(m.data);
@@ -47,6 +48,22 @@
   <title>En Gång Till!</title>
 </svelte:head>
 
+{#if simple}
+<main>
+    <ul class="bidrag">
+        {#each sortedScore as { name, points }, i (name + "admin")}
+          <li class="simpleLi" animate:flip transition:slide={{ delay: 150, duration: 150 }}>
+            <h2 class={state[name] ? "got-point" : ""}>
+              <div class="textopoints">
+                <span>{name}</span>
+                <span class="margRight">{points}</span>
+              </div>
+            </h2>
+          </li>
+        {/each}
+</ul>
+</main>
+{:else} 
 <main>
   <video muted autoplay loop src="/video.mp4" type="video/mp4" />
   {#if admin}
@@ -59,7 +76,7 @@
           <li class={"adminStyle"}>
             <h3>
               <img
-                src={`/${name.toLocaleLowerCase().slice(0, 3).png}`}
+                src={`/${name.toLocaleLowerCase().slice(0, 3)}.png`}
                 alt="logo"
                 class="logo"
               />
@@ -112,6 +129,7 @@
     </div>
   </div>
 </main>
+{/if}
 
 <!-- todo, skugga gradient, fontval, loggor, färger 
 
@@ -206,6 +224,14 @@
     transition: background-color 500ms linear;
   }
 
+h2 {
+margin: 0;
+padding: 0;
+display: flex;
+font-size: 1em;
+
+}
+
   .got-point {
     background: linear-gradient(
       90deg,
@@ -215,6 +241,7 @@
   }
   img {
     border-radius: 3px;
+    background-color: black;
   }
   .textopoints {
     padding-left: 30px;
@@ -244,4 +271,25 @@
   .adminStyle {
     display: flex;
   }
+.simpleLi{
+width: 760px;
+margin-top: 20px;
+background-color: #2E3E64;
+padding: 3px;
+
+}
+.simpleIcon {
+    max-height: 60px;
+    max-width: 60px;
+}
+
+  .simple-logo-container {
+    width: 60px;
+    display: flex;
+    justify-content: center;
+  }
+.margRight {
+margin-right: 10px;
+}
 </style>
+
